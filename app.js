@@ -1,7 +1,6 @@
-import path from 'path';
 import express from "express";
 import mongoose from "mongoose";
-import router from './routes/users.js';
+import userRouter from './routes/users.js';
 import bodyParser from 'body-parser';
 
 const { PORT = 3000, BASE_PATH } = process.env;
@@ -19,7 +18,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', router);
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
 
 app.listen(PORT, () => {
   console.log('BASE_PATH ', BASE_PATH)
