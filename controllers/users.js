@@ -24,7 +24,7 @@ export function udateUserInfo(req, res) {
   User.findByIdAndUpdate(req.user._id, { name: name, about: about }, { new: true })
     .then(user => res.send({ data: user }))
     .catch(() => res.status(500).res.send({message: 'Произошла ошибка'}))
-}
+};
 
 export function updateAvatar(req, res) {
   const { avatar } = req.body;
