@@ -9,8 +9,7 @@ export function getAllCards(req, res) {
 
 export function createCard(req, res) {
   const { name, link } = req.body;
-  const { _id } = req.user;
-  Card.create({ name, link, owner: _id })
+  Card.create({ name, link, owner: req.user._id })
   .then(card => res.send({ data: card }))
   .catch(() => res.status(500).send({message: 'Произошла ошибка'}))
 };
