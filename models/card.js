@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import user from "./user";
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -8,7 +7,7 @@ const cardSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30
   },
-  ling: {
+  link: {
     type: String,
     required: true
   },
@@ -18,7 +17,6 @@ const cardSchema = new mongoose.Schema({
     required: true
   },
   likes: [{
-    //hz kak delat`
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true
@@ -29,4 +27,4 @@ const cardSchema = new mongoose.Schema({
   }
 });
 
-export default new mongoose.Model('card', cardSchema);
+export default new mongoose.model('card', cardSchema);

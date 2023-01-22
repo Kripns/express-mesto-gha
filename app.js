@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import userRouter from './routes/users.js';
+import cardRouter from './routes/cards.js'
 import bodyParser from 'body-parser';
 
 const { PORT = 3000, BASE_PATH } = process.env;
