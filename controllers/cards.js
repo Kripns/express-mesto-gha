@@ -71,7 +71,7 @@ export function dislikeCard(req, res) {
   )
     .then((card) => {
       if (!card) {
-       return handleNotFoundError(res, "Запрашиваемая карточка не найдена");
+        return handleNotFoundError(res, "Запрашиваемая карточка не найдена");
       }
       return res.send({ data: card });
     })

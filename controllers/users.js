@@ -36,7 +36,7 @@ export function createUser(req, res) {
       if (err.name === "ValidationError") {
         return handleBadRequestError(res);
       } else {
-          return handleDefaultError(res);
+        return handleDefaultError(res);
       }
     });
 }
@@ -65,7 +65,11 @@ export function udateUserInfo(req, res) {
 
 export function updateAvatar(req, res) {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar: avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar: avatar },
+    { new: true, runValidators: true }
+  )
     .then((user) => {
       if (!user) {
         return handleNotFoundError(res, "Запрашиваемый пользователь не найден");
