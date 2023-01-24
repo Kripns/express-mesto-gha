@@ -1,3 +1,4 @@
+import { constants } from 'http2'
 import Card from "../models/card.js";
 
 export function getAllCards(req, res) {
@@ -11,13 +12,19 @@ export function createCard(req, res) {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
   .then(card => res.send({ data: card }))
-  .catch(() => res.status(500).send({message: 'Произошла ошибка'}))
+  .catch((err) => {
+    console.log('err name', err.name)
+    res.status(500).send({message: 'Произошла ошибка'})
+  })
 };
 
 export function deleteCard(req, res) {
   Card.findByIdAndRemove(req.params.cardId)
     .then(card => res.send({ data: card }))
-    .catch(() => res.status(500).send({message: 'Произошла ошибка'}))
+    .catch((err) => {
+      console.log('err name', err.name)
+      res.status(500).send({message: 'Произошла ошибка'})
+    })
 };
 
 export function likeCard(req, res) {
@@ -27,7 +34,10 @@ export function likeCard(req, res) {
     { new: true }
   )
     .then(card => res.send({ data: card }))
-    .catch(() => res.status(500).send({message: 'Произошла ошибка'}))
+    .catch((err) => {
+      console.log('err name', err.name)
+      res.status(500).send({message: 'Произошла ошибка'})
+    })
 };
 
 export function dislikeCard(req, res) {
@@ -37,5 +47,8 @@ export function dislikeCard(req, res) {
     { new: true }
   )
     .then(card => res.send({ data: card }))
-    .catch(() => res.status(500).send({message: 'Произошла ошибка'}))
+    .catch((err) => {
+      console.log('err name', err)
+      res.status(500).send({message: 'Произошла ошибка'})
+    })
 };
