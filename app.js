@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import userRouter from './routes/users.js';
 import cardRouter from './routes/cards.js'
 import bodyParser from 'body-parser';
-import { constants } from 'http2';
 
 const { PORT = 3000 } = process.env;
 const app = express();

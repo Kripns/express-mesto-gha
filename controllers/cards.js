@@ -1,31 +1,46 @@
-import { constants } from 'http2'
 import Card from "../models/card.js";
+import {
+  handleBadRequestError,
+  handleNotFoundError,
+  handleDefaultError,
+} from "../utils/errorHandlers.js";
 
 export function getAllCards(req, res) {
   Card.find({})
-    .populate('owner')
-    .then(cards => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
-};
+    .populate("owner")
+    .then((cards) => res.send({ data: cards }))
+    .catch(() => handleDefaultError(res));
+}
 
 export function createCard(req, res) {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-  .then(card => res.send({ data: card }))
-  .catch((err) => {
-    console.log('err name', err.name)
-    res.status(500).send({message: 'Произошла ошибка'})
-  })
-};
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return handleBadRequestError(res);
+      } else {
+        return handleDefaultError(res);
+      }
+    });
+}
 
 export function deleteCard(req, res) {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(card => res.send({ data: card }))
-    .catch((err) => {
-      console.log('err name', err.name)
-      res.status(500).send({message: 'Произошла ошибка'})
+    .then((card) => {
+      if (!card) {
+        return handleNotFoundError(res, "Запрашиваемая карточка не найдена");
+      }
+      return res.send({ data: card });
     })
-};
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return handleBadRequestError(res);
+      } else {
+        return handleDefaultError(res);
+      }
+    });
+}
 
 export function likeCard(req, res) {
   Card.findByIdAndUpdate(
@@ -33,12 +48,20 @@ export function likeCard(req, res) {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .then(card => res.send({ data: card }))
-    .catch((err) => {
-      console.log('err name', err.name)
-      res.status(500).send({message: 'Произошла ошибка'})
+    .then((card) => {
+      if (!card) {
+        return handleNotFoundError(res, "Запрашиваемая карточка не найдена");
+      }
+      return res.send({ data: card });
     })
-};
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return handleBadRequestError(res);
+      } else {
+        return handleDefaultError(res);
+      }
+    });
+}
 
 export function dislikeCard(req, res) {
   Card.findByIdAndUpdate(
@@ -46,9 +69,17 @@ export function dislikeCard(req, res) {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .then(card => res.send({ data: card }))
-    .catch((err) => {
-      console.log('err name', err)
-      res.status(500).send({message: 'Произошла ошибка'})
+    .then((card) => {
+      if (!card) {
+       return handleNotFoundError(res, "Запрашиваемая карточка не найдена");
+      }
+      return res.send({ data: card });
     })
-};
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return handleBadRequestError(res);
+      } else {
+        return handleDefaultError(res);
+      }
+    });
+}
