@@ -1,5 +1,9 @@
-import express from 'express'
-import { getAllCards, createCard, deleteCard, likeCard, dislikeCard } from '../controllers/cards.js';
+/* eslint-disable import/extensions */
+import express from 'express';
+import {
+  getAllCards, createCard, deleteCard, likeCard, dislikeCard,
+} from '../controllers/cards.js';
+
 const router = express.Router();
 
 router.get('/', getAllCards);
