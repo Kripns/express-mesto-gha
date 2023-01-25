@@ -1,4 +1,5 @@
 /* eslint-disable import/extensions */
+import isUrl from 'is-url';
 import User from '../models/user.js';
 import {
   handleBadRequestError,
@@ -31,7 +32,10 @@ export function getUser(req, res) {
 export function createUser(req, res) {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!isUrl(avatar)) return handleBadRequestError(res);
+      return res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return handleBadRequestError(res);
@@ -69,9 +73,8 @@ export function updateAvatar(req, res) {
     { new: true, runValidators: true },
   )
     .then((user) => {
-      if (!user) {
-        return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
-      }
+      if (!user) return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
+      if (!isUrl(avatar)) return handleBadRequestError(res);
       return res.send({ data: user });
     })
     .catch((err) => {

@@ -1,4 +1,5 @@
 /* eslint-disable import/extensions */
+import isUrl from 'is-url';
 import Card from '../models/card.js';
 import {
   handleBadRequestError,
@@ -16,7 +17,10 @@ export function getAllCards(req, res) {
 export function createCard(req, res) {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (!isUrl(link)) return handleBadRequestError(res);
+      return res.send({ data: card });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return handleBadRequestError(res);
