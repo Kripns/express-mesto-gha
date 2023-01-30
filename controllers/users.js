@@ -1,5 +1,5 @@
 /* eslint-disable import/extensions */
-import isUrl from 'is-url';
+import isUrl from 'validator/lib/isURL.js';
 import User from '../models/user.js';
 import {
   handleBadRequestError,
