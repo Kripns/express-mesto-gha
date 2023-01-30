@@ -1,4 +1,5 @@
 /* eslint-disable import/extensions */
+import bcrypt from 'bcrypt';
 import isUrl from 'validator/lib/isURL.js';
 import User from '../models/user.js';
 import {
@@ -30,11 +31,25 @@ export function getUser(req, res) {
 }
 
 export function createUser(req, res) {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => {
-      if (!isUrl(avatar)) return handleBadRequestError(res);
-      return res.send({ data: user });
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => {
+      const {
+        name,
+        about,
+        avatar,
+        email,
+      } = req.body;
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then((user) => {
+          if (!isUrl(avatar)) return handleBadRequestError(res);
+          return res.send({ data: user });
+        });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
