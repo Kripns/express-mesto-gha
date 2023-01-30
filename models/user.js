@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 // import isURL from 'validator/lib/isURL';
 
@@ -40,5 +41,22 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+// eslint-disable-next-line arrow-body-style
+userSchema.statics.findUserByCredentials = (email, password) => {
+  return this.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильная почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Неправильная почта или пароль'));
+          }
+          return user;
+        });
+    });
+};
 
 export default mongoose.model('user', userSchema);
