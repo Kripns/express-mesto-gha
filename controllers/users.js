@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 import bcrypt from 'bcrypt';
 // import crypto from 'crypto';
-import { jwt } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import isUrl from 'validator/lib/isURL.js';
 import User from '../models/user.js';
 import {
@@ -35,14 +35,10 @@ export function getUser(req, res) {
 }
 
 export function createUser(req, res) {
-  bcrypt.hash(req.body.password, 10)
+  // eslint-disable-next-line object-curly-newline
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10)
     .then((hash) => {
-      const {
-        name,
-        about,
-        avatar,
-        email,
-      } = req.body;
       User.create({
         name,
         about,

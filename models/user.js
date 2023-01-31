@@ -1,8 +1,10 @@
+/* eslint-disable import/extensions */
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import isEmail from 'validator/lib/isEmail';
+import isEmail from 'validator/lib/isEmail.js';
 // import isURL from 'validator/lib/isURL';
 
+// eslint-disable-next-line function-paren-newline
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -40,23 +42,43 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-});
-
-// eslint-disable-next-line arrow-body-style
-userSchema.statics.findUserByCredentials = (email, password) => {
-  return this.findOne({ email })
-    .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Неправильная почта или пароль'));
-      }
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
+},
+{
+  statics: {
+    findUserByCredentials(email, password) {
+      return this.findOne({ email })
+        .then((user) => {
+          if (!user) {
             return Promise.reject(new Error('Неправильная почта или пароль'));
           }
-          return user;
+          return bcrypt.compare(password, user.password)
+            .then((matched) => {
+              if (!matched) {
+                return Promise.reject(new Error('Неправильная почта или пароль'));
+              }
+              return user;
+            });
         });
-    });
-};
+    },
+  },
+},
+);
+
+// eslint-disable-next-line func-names
+// userSchema.statics.findUserByCredentials = function (email, password) {
+//   return this.findOne({ email })
+//     .then((user) => {
+//       if (!user) {
+//         return Promise.reject(new Error('Неправильная почта или пароль'));
+//       }
+//       return bcrypt.compare(password, user.password)
+//         .then((matched) => {
+//           if (!matched) {
+//             return Promise.reject(new Error('Неправильная почта или пароль'));
+//           }
+//           return user;
+//         });
+//     });
+// };
 
 export default mongoose.model('user', userSchema);

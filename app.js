@@ -2,6 +2,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import { login, createUser } from './controllers/users.js';
 import userRouter from './routes/users.js';
 import cardRouter from './routes/cards.js';
 import { handleNotFoundError } from './utils/errorHandlers.js';
@@ -18,6 +19,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 app.use((req, res) => {
