@@ -1,6 +1,7 @@
 /* eslint-disable import/extensions */
 import {
   BAD_REQUEST_ERROR_CODE,
+  UNAUTHORIZED_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
   DEFAULT_ERROR_CODE,
 } from './errorCodes.js';
@@ -9,6 +10,12 @@ export function handleBadRequestError(res) {
   res
     .status(BAD_REQUEST_ERROR_CODE)
     .send({ message: 'Переданы некорректные данные' });
+}
+
+export function handleUnauthorizedError(res) {
+  res
+    .status(UNAUTHORIZED_ERROR_CODE)
+    .send({ message: 'Необходима авторизация' });
 }
 
 export function handleNotFoundError(res, message) {

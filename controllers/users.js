@@ -9,8 +9,7 @@ import {
   handleNotFoundError,
   handleDefaultError,
 } from '../utils/errorHandlers.js';
-
-const secretCode = 'f0c122a3d7449d928da12fd11eac41a3327b3f14b588358c7ba90c5abd9575c7';
+import secretKey from '../utils/secretKey.js';
 
 export function getAllUsers(req, res) {
   User.find({})
@@ -63,7 +62,7 @@ export function login(req, res) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, secretCode, { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
       res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7 }).end();
     })
     .catch((err) => {
@@ -72,7 +71,7 @@ export function login(req, res) {
 //  TODO CATCH ERRORS!!
 }
 
-export function udateUserInfo(req, res) {
+export function updateUserInfo(req, res) {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
