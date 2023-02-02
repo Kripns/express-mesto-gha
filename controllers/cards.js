@@ -5,6 +5,7 @@ import {
   handleBadRequestError,
   handleNotFoundError,
   handleDefaultError,
+  handleForbiddenError,
 } from '../utils/errorHandlers.js';
 
 export function getAllCards(req, res) {
@@ -34,6 +35,9 @@ export function deleteCard(req, res) {
     .then((card) => {
       if (!card) {
         return handleNotFoundError(res, 'Запрашиваемая карточка не найдена');
+      }
+      if (card.owner !== req.user._id) {
+        return handleForbiddenError(res);
       }
       return res.send({ data: card });
     })

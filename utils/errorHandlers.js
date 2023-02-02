@@ -3,6 +3,7 @@ import {
   BAD_REQUEST_ERROR_CODE,
   UNAUTHORIZED_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
   DEFAULT_ERROR_CODE,
 } from './errorCodes.js';
 
@@ -16,6 +17,12 @@ export function handleUnauthorizedError(res) {
   res
     .status(UNAUTHORIZED_ERROR_CODE)
     .send({ message: 'Необходима авторизация' });
+}
+
+export function handleForbiddenError(res) {
+  res
+    .status(FORBIDDEN_ERROR_CODE)
+    .send({ message: 'Недостаточно прав' });
 }
 
 export function handleNotFoundError(res, message) {

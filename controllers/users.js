@@ -1,3 +1,4 @@
+/* eslint-disable object-curly-newline */
 /* eslint-disable import/extensions */
 import bcrypt from 'bcrypt';
 // import crypto from 'crypto';
@@ -34,17 +35,10 @@ export function getUser(req, res) {
 }
 
 export function createUser(req, res) {
-  // eslint-disable-next-line object-curly-newline
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
+      User.create({ name, about, avatar, email, password: hash })
         .then((user) => {
           if (!isUrl(avatar)) return handleBadRequestError(res);
           return res.send({ data: user });
@@ -109,5 +103,13 @@ export function updateAvatar(req, res) {
         return handleBadRequestError(res);
       }
       return handleDefaultError(res);
+    });
+}
+
+export function getCurrentUser(req, res) {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
+      return res.send({ data: user });
     });
 }
