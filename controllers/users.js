@@ -2,63 +2,61 @@
 /* eslint-disable object-curly-newline */
 /* eslint-disable import/extensions */
 import bcrypt from 'bcrypt';
-// import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import isUrl from 'validator/lib/isURL.js';
 import User from '../models/user.js';
-import {
-  handleBadRequestError,
-  handleNotFoundError,
-  handleDefaultError,
-  handleUnauthorizedError,
-} from '../utils/errorHandlers.js';
+import BadRequestError from '../utils/errors/bad-request-error.js';
+import NotFoundError from '../utils/errors/not-found-error.js';
+import DefaultError from '../utils/errors/default-error.js';
+import ConflictError from '../utils/errors/conflict-error.js';
+import UnauthorizedError from '../utils/errors/unauthorized-error.js';
 import secretKey from '../utils/secretKey.js';
 
-export function getAllUsers(req, res) {
+export function getAllUsers(req, res, next) {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => handleDefaultError(res));
+    .catch(next);
 }
 
-export function getUser(req, res) {
+export function getUser(req, res, next) {
   User.findById(req.params.id)
     .then((user) => {
-      if (!user) {
-        return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
-      }
+      if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return handleBadRequestError(res);
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       }
-      return handleDefaultError(res);
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные'));
+      }
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 }
 
-export function createUser(req, res) {
+export function createUser(req, res, next) {
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
         .then((user) => {
-          if (!isUrl(avatar)) return handleBadRequestError(res);
+          if (!isUrl(avatar)) throw new BadRequestError('Неправильный формат ссылки');
           return res.send({ data: user });
         });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return res.status(409)
-          .send({ message: 'Пользователь с такой почтой уже зарегистрирован' });
+        next(new ConflictError('Пользователь с такой почтой уже зарегистрирован'));
       }
       if (err.name === 'ValidationError') {
-        return handleBadRequestError(res);
+        next(new BadRequestError('Переданы некорректные данные'));
       }
-      return handleDefaultError(res);
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 }
 
-export function login(req, res) {
+export function login(req, res, next) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -66,12 +64,14 @@ export function login(req, res) {
       res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные'));
+      }
+      next(new DefaultError('На сервере произошла ошибка'));
     });
-//  TODO CATCH ERRORS!!
 }
 
-export function updateUserInfo(req, res) {
+export function updateUserInfo(req, res, next) {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -79,20 +79,21 @@ export function updateUserInfo(req, res) {
     { new: true, runValidators: true },
   )
     .then((user) => {
-      if (!user) {
-        return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
-      }
+      if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return handleBadRequestError(res);
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       }
-      return handleDefaultError(res);
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные'));
+      }
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 }
 
-export function updateAvatar(req, res) {
+export function updateAvatar(req, res, next) {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -100,25 +101,35 @@ export function updateAvatar(req, res) {
     { new: true, runValidators: true },
   )
     .then((user) => {
-      if (!user) return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
-      if (!isUrl(avatar)) return handleBadRequestError(res);
+      if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
+      if (!isUrl(avatar)) throw new BadRequestError('Неправильный формат ссылки');
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return handleBadRequestError(res);
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       }
-      return handleDefaultError(res);
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные'));
+      }
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 }
 
-export function getCurrentUser(req, res) {
-  if (!req.user._id) {
-    return handleUnauthorizedError(res);
-  }
+export function getCurrentUser(req, res, next) {
+  if (!req.user._id) throw new UnauthorizedError('Необходима авторизация');
   User.findById(req.user._id)
     .then((user) => {
-      if (!user) return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');
+      if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
       return res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
+      }
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные'));
+      }
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 }
