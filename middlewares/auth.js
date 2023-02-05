@@ -7,12 +7,13 @@ import secretKey from '../utils/secretKey.js';
 export default function auth(req, res, next) {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return handleUnauthorizedError;
+    return handleUnauthorizedError(res);
   }
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, secretKey);
+    // console.log(payload);
   } catch (err) {
     return handleUnauthorizedError(res);
   }

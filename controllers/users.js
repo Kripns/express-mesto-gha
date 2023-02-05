@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable object-curly-newline */
 /* eslint-disable import/extensions */
 import bcrypt from 'bcrypt';
@@ -9,6 +10,7 @@ import {
   handleBadRequestError,
   handleNotFoundError,
   handleDefaultError,
+  handleUnauthorizedError,
 } from '../utils/errorHandlers.js';
 import secretKey from '../utils/secretKey.js';
 
@@ -45,6 +47,10 @@ export function createUser(req, res) {
         });
     })
     .catch((err) => {
+      if (err.code === 11000) {
+        return res.status(409)
+          .send({ message: 'Пользователь с такой почтой уже зарегистрирован' });
+      }
       if (err.name === 'ValidationError') {
         return handleBadRequestError(res);
       }
@@ -57,7 +63,7 @@ export function login(req, res) {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
-      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7 }).end();
+      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
     })
     .catch((err) => {
       res.status(401).send({ message: err.message });
@@ -107,6 +113,9 @@ export function updateAvatar(req, res) {
 }
 
 export function getCurrentUser(req, res) {
+  if (!req.user._id) {
+    return handleUnauthorizedError(res);
+  }
   User.findById(req.user._id)
     .then((user) => {
       if (!user) return handleNotFoundError(res, 'Запрашиваемый пользователь не найден');

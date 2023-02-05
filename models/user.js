@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail.js';
+import UnauthorizedError from '../utils/errors/unauthorized-error.js';
 // import isURL from 'validator/lib/isURL';
 
 // eslint-disable-next-line function-paren-newline
@@ -50,12 +51,12 @@ const userSchema = new mongoose.Schema({
       return this.findOne({ email }).select('+password')
         .then((user) => {
           if (!user) {
-            return Promise.reject(new Error('Неправильная почта или пароль'));
+            return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
           }
           return bcrypt.compare(password, user.password)
             .then((matched) => {
               if (!matched) {
-                return Promise.reject(new Error('Неправильная почта или пароль'));
+                return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
               }
               return user;
             });
