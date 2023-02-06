@@ -4,7 +4,7 @@ import { FORBIDDEN_ERROR_CODE } from '../errorCodes.js';
 class ForbiddenError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode(FORBIDDEN_ERROR_CODE);
+    this.statusCode = FORBIDDEN_ERROR_CODE;
   }
 }
 

@@ -3,7 +3,6 @@ import isUrl from 'validator/lib/isURL.js';
 import Card from '../models/card.js';
 import BadRequestError from '../utils/errors/bad-request-error.js';
 import NotFoundError from '../utils/errors/not-found-error.js';
-import DefaultError from '../utils/errors/default-error.js';
 import ForbiddenError from '../utils/errors/forbiden-error.js';
 
 export function getAllCards(req, res, next) {
@@ -24,24 +23,25 @@ export function createCard(req, res, next) {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(new DefaultError('На сервере произошла ошибка'));
+      next(err);
     });
 }
 
 export function deleteCard(req, res, next) {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) throw new NotFoundError('Запрашиваемая карточка не найдена');
-      if (card.owner !== req.user._id) {
+      if (card.owner.valueOf() !== req.user._id) {
         throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
-      return res.send({ data: card });
+      Card.findByIdAndRemove(req.params.cardId)
+        .then((removedCard) => res.send({ data: removedCard }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new NotFoundError('Запрашиваемая карточка не найдена'));
+        next(new BadRequestError('Введен некорректный _id карточки'));
       }
-      next(new DefaultError('На сервере произошла ошибка'));
+      next(err);
     });
 }
 
@@ -57,9 +57,9 @@ export function likeCard(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new NotFoundError('Запрашиваемая карточка не найдена'));
+        next(new BadRequestError('Введен некорректный _id карточки'));
       }
-      next(new DefaultError('На сервере произошла ошибка'));
+      next(err);
     });
 }
 
@@ -75,8 +75,8 @@ export function dislikeCard(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new NotFoundError('Запрашиваемая карточка не найдена'));
+        next(new BadRequestError('Введен некорректный _id карточки'));
       }
-      next(new DefaultError('На сервере произошла ошибка'));
+      next(err);
     });
 }
