@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /* eslint-disable import/extensions */
 import express from 'express';
 import { celebrate, Joi } from 'celebrate';
@@ -12,7 +11,7 @@ router.get('/', getAllUsers);
 router.get('/me', getCurrentUser);
 
 router.get('/:id', celebrate({
-  params: object().keys({
+  params: Joi.object().keys({
     id: Joi
       .string()
       .alphanum()
