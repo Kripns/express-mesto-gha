@@ -2,33 +2,30 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail.js';
+import isURL from 'validator/lib/isURL';
 import UnauthorizedError from '../utils/errors/unauthorized-error.js';
-// import isURL from 'validator/lib/isURL';
 
 // eslint-disable-next-line function-paren-newline
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     default: 'Жак-Ив Кусто',
-    // required: true,
-    // minlength: 2,
-    // maxlength: 30,
+    minlength: 2,
+    maxlength: 30,
   },
   about: {
     type: String,
     default: 'Исследователь',
-    // required: true,
-    // minlength: 2,
-    // maxlength: 30,
+    minlength: 2,
+    maxlength: 30,
   },
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    // required: true,
-    // validate: {
-    //   validator: (v) => isURL(v),
-    //   message: 'Неправильныая ссылка на аватар',
-    // },
+    validate: {
+      validator: (v) => isURL(v),
+      message: 'Неправильныая ссылка на аватар',
+    },
   },
   email: {
     type: String,
