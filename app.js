@@ -2,6 +2,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import { celebrate, Joi, errors } from 'celebrate';
 import { login, createUser } from './controllers/users.js';
 import userRouter from './routes/users.js';
 import cardRouter from './routes/cards.js';
@@ -14,14 +15,53 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.post('/signin', login);
-app.post('/signup', createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi
+      .string()
+      .email()
+      .required(),
+    password: Joi
+      .string()
+      .required(),
+  }),
+}), login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi
+      .string()
+      .email()
+      .required(),
+    password: Joi
+      .string()
+      .required(),
+    name: Joi
+      .string()
+      .min(2)
+      .max(30),
+    about: Joi
+      .string()
+      .min(2)
+      .max(30),
+    avatar: Joi
+      .string()
+      .min(2)
+      .max(30)
+      .uri(),
+  }),
+}), createUser);
+
 app.use('/users', auth, userRouter);
 app.use('/cards', auth, cardRouter);
+
 app.use((req, res, next) => {
   const err = new NotFoundError('Ошибка 404: Страница не найдена');
   next(err);
 });
+
+app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -36,5 +76,3 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT);
-// TODO: не работают ошибки
-// убрать во всех контроллерах 500 ошибку
