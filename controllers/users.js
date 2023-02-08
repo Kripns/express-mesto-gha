@@ -73,7 +73,7 @@ export function login(req, res, next) {
 
 export function logout(req, res, next) {
   try {
-    res.clearCookies('jwt').send({ message: 'Вы вышли' });
+    res.clearCookie('jwt').send({ message: 'Вы вышли' });
   } catch (err) {
     next(err);
   }
