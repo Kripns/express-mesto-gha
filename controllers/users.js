@@ -1,5 +1,3 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable object-curly-newline */
 /* eslint-disable import/extensions */
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -24,34 +22,39 @@ export function getUser(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Введен некорректный _id пользователя'));
+        next(new BadRequestError('Передан некорректный _id пользователя'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
 export function createUser(req, res, next) {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash })
-        .then((user) => {
-          return res.send({ data: {
+      User.create({
+        name, about, avatar, email, password: hash,
+      })
+        .then((user) => res.send({
+          data: {
             name: user.name,
             about: user.about,
             avatar: user.avatar,
             email: user.email,
             _id: user._id,
-          } });
-        })
+          },
+        }))
         .catch((err) => {
           if (err.code && err.code === 11000) {
             next(new ConflictError('Пользователь с такой почтой уже зарегистрирован'));
-          }
-          if (err.name === 'ValidationError') {
+          } else if (err.name === 'ValidationError') {
             next(new BadRequestError('Переданы некорректные данные'));
+          } else {
+            next(err);
           }
-          next(err);
         });
     });
 }
@@ -65,12 +68,15 @@ export function login(req, res, next) {
         .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
         .send({ message: 'Вы вошли' });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      }
-      next(err);
-    });
+    .catch(next);
+}
+
+export function logout(req, res, next) {
+  try {
+    res.clearCookies('jwt').send({ message: 'Вы вышли' });
+  } catch (err) {
+    next(err);
+  }
 }
 
 export function updateUserInfo(req, res, next) {
@@ -87,12 +93,12 @@ export function updateUserInfo(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Введен некорректный _id пользователя'));
-      }
-      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Передан некорректный _id пользователя'));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -107,16 +113,17 @@ export function updateAvatar(req, res, next) {
         { avatar },
         { new: true, runValidators: true },
       )
-        .then((updatedUser) => res.send({ data: updatedUser }));
+        .then((updatedUser) => res.send({ data: updatedUser }))
+        .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Введен некорректный _id пользователя'));
-      }
-      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Передан некорректный _id пользователя'));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -128,11 +135,9 @@ export function getCurrentUser(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Введен некорректный _id пользователя'));
+        next(new BadRequestError('Передан некорректный _id пользователя'));
+      } else {
+        next(err);
       }
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      }
-      next(err);
     });
 }

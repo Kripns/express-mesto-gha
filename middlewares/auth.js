@@ -12,7 +12,8 @@ export default function auth(req, res, next) {
   try {
     payload = jwt.verify(token, secretKey);
   } catch (err) {
-    next(err);
+    next(new UnauthorizedError('Необходима авторизация'));
+    return;
   }
   req.user = payload;
   next();

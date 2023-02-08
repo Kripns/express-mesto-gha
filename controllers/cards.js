@@ -22,8 +22,9 @@ export function createCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -35,13 +36,15 @@ export function deleteCard(req, res, next) {
         throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
       Card.findByIdAndRemove(req.params.cardId)
-        .then((removedCard) => res.send({ data: removedCard }));
+        .then((removedCard) => res.send({ data: removedCard }))
+        .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Введен некорректный _id карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -58,8 +61,9 @@ export function likeCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Введен некорректный _id карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -76,7 +80,8 @@ export function dislikeCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Введен некорректный _id карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
