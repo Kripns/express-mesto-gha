@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return */
+/* eslint-disable arrow-body-style */
 /* eslint-disable object-curly-newline */
 /* eslint-disable import/extensions */
 import bcrypt from 'bcrypt';
@@ -36,7 +36,6 @@ export function createUser(req, res, next) {
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
         .then((user) => {
-          if (!isUrl(avatar)) throw new BadRequestError('Неправильный формат ссылки');
           return res.send({ data: {
             name: user.name,
             about: user.about,

@@ -2,6 +2,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import { celebrate, Joi, errors } from 'celebrate';
 import { login, createUser } from './controllers/users.js';
 import userRouter from './routes/users.js';
@@ -16,6 +17,7 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
