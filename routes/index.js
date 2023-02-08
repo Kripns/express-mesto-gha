@@ -10,18 +10,6 @@ import urlPattern from '../utils/urlPattern.js';
 
 const router = express.Router();
 
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi
-      .string()
-      .email()
-      .required(),
-    password: Joi
-      .string()
-      .required(),
-  }),
-}), login);
-
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi
@@ -49,6 +37,18 @@ router.post('/signup', celebrate({
       .pattern(urlPattern),
   }),
 }), createUser);
+
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi
+      .string()
+      .email()
+      .required(),
+    password: Joi
+      .string()
+      .required(),
+  }),
+}), login);
 
 router.use(auth);
 
