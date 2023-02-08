@@ -4,6 +4,7 @@ import { celebrate, Joi } from 'celebrate';
 import {
   getAllCards, createCard, deleteCard, likeCard, dislikeCard,
 } from '../controllers/cards.js';
+import urlPattern from '../utils/urlPattern.js';
 
 const router = express.Router();
 
@@ -19,7 +20,8 @@ router.post('/', celebrate({
     link: Joi
       .string()
       .uri()
-      .required(),
+      .required()
+      .pattern(urlPattern),
   }),
 }), createCard);
 
