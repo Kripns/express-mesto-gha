@@ -37,7 +37,13 @@ export function createUser(req, res, next) {
       User.create({ name, about, avatar, email, password: hash })
         .then((user) => {
           if (!isUrl(avatar)) throw new BadRequestError('Неправильный формат ссылки');
-          return res.send({ data: user });
+          return res.send({ data: {
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+            _id: user._id,
+          } });
         })
         .catch((err) => {
           if (err.code && err.code === 11000) {

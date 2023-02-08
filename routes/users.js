@@ -4,6 +4,7 @@ import { celebrate, Joi } from 'celebrate';
 import {
   getAllUsers, getCurrentUser, getUser, updateAvatar, updateUserInfo,
 } from '../controllers/users.js';
+import urlPattern from '../utils/urlPattern.js';
 
 const router = express.Router();
 
@@ -38,7 +39,8 @@ router.patch('/me/avatar', celebrate({
       .string()
       .min(2)
       .max(30)
-      .uri(),
+      .uri()
+      .pattern(urlPattern),
   }),
 }), updateAvatar);
 

@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail.js';
+import urlPattern from '../utils/urlPattern.js';
 import UnauthorizedError from '../utils/errors/unauthorized-error.js';
 
 // eslint-disable-next-line function-paren-newline
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    match: /^https?:\/\/(www\.)?[\w\-_~]+\.[\w\-_~]+[\w\-.~:/?#[\]@!$&'()*+,;=]*#?/i,
+    match: urlPattern,
   },
   email: {
     type: String,

@@ -8,6 +8,7 @@ import userRouter from './routes/users.js';
 import cardRouter from './routes/cards.js';
 import auth from './middlewares/auth.js';
 import NotFoundError from './utils/errors/not-found-error.js';
+import urlPattern from './utils/urlPattern.js';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -39,17 +40,21 @@ app.post('/signup', celebrate({
       .required(),
     name: Joi
       .string()
+      .default('Жак-Ив Кусто')
       .min(2)
       .max(30),
     about: Joi
       .string()
+      .default('Исследователь')
       .min(2)
       .max(30),
     avatar: Joi
       .string()
+      .default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png')
       .min(2)
       .max(30)
-      .uri(),
+      .uri()
+      .pattern(urlPattern),
   }),
 }), createUser);
 
