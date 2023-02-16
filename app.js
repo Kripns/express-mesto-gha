@@ -7,6 +7,7 @@ import { errors } from 'celebrate';
 import routes from './routes/index.js';
 import centralizedErrorHandler from './middlewares/centralizedErrorHandler.js';
 import { requestLogger, errorLogger } from './middlewares/logger.js';
+import corsHandler from './middlewares/cors.js';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -17,6 +18,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(requestLogger);
+
+app.use(corsHandler);
 
 app.use(routes);
 
