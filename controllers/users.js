@@ -70,13 +70,13 @@ export function login(req, res, next) {
           httpOnly: true,
           sameSite: 'none',
           secure: true,
-          domain: '.psid.students.nomoredomains.work/',
+          domain: '.psid.students.nomoredomains.work',
         })
         .cookie('testCookie', 'Вы вошли', {
           maxAge: 3600000 * 24 * 7,
           sameSite: 'none',
           secure: true,
-          domain: '.psid.students.nomoredomains.work/',
+          domain: '.psid.students.nomoredomains.work',
         })
         .send({ data: user });
     })
