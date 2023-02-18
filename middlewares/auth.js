@@ -5,6 +5,7 @@ import secretKey from '../utils/secretKey.js';
 
 export default function auth(req, res, next) {
   const token = req.cookies.jwt;
+  console.log('req cookies', req.cookies);
   if (!token) {
     throw new UnauthorizedError('Необходима авторизация');
   }

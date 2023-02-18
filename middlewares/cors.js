@@ -2,8 +2,10 @@ const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 const allowedCors = [
   'https://psid.students.nomoredomains.work',
   'http://psid.students.nomoredomains.work',
+  'https://api.psid.students.nomoredomains.work',
+  'http://api.psid.students.nomoredomains.work',
   'http://localhost:3000',
-  'https://localhost:3000',
+  'http://localhost:3001',
 ];
 
 export default function corsHandler(req, res, next) {
