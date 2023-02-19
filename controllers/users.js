@@ -10,7 +10,7 @@ import secretKey from '../utils/secretKey.js';
 
 export function getAllUsers(req, res, next) {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(next);
 }
 
@@ -18,7 +18,7 @@ export function getUser(req, res, next) {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -39,13 +39,11 @@ export function createUser(req, res, next) {
         name, about, avatar, email, password: hash,
       })
         .then((user) => res.send({
-          data: {
-            name: user.name,
-            about: user.about,
-            avatar: user.avatar,
-            email: user.email,
-            _id: user._id,
-          },
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+          _id: user._id,
         }))
         .catch((err) => {
           if (err.code && err.code === 11000) {
@@ -65,31 +63,40 @@ export function login(req, res, next) {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
       return res
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: 'none',
-          secure: true,
-          domain: '.students.nomoredomains.work',
-        })
-        .cookie('testCookie', 'Вы вошли', {
-          maxAge: 3600000 * 24 * 7,
-          sameSite: 'none',
-          secure: true,
-          domain: '.students.nomoredomains.work',
-        })
-        .send({ data: user });
+        .send({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          about: user.about,
+          avatar: user.avatar,
+          token,
+        });
     })
+  // return res
+  //   .cookie('jwt', token, {
+  //     maxage: 3600000 * 24 * 7,
+  //     httpOnly: true,
+  //     sameSite: 'none',
+  //     secure: true,
+  //     domain: 'localhost',
+  //   })
+  //   .cookie('testCookie', 'Вы вошли', {
+  //     maxage: 3600000 * 24 * 7,
+  //     sameSite: 'none',
+  //     secure: true,
+  //     domain: 'localhost',
+  //   })
+  // .send({ data: user });
     .catch(next);
 }
 
-export function logout(req, res, next) {
-  try {
-    res.clearCookie('jwt').send({ message: 'Вы вышли' });
-  } catch (err) {
-    next(err);
-  }
-}
+// export function logout(req, res, next) {
+//   try {
+//     res.clearCookie('jwt').send({ message: 'Вы вышли' });
+//   } catch (err) {
+//     next(err);
+//   }
+// }
 
 export function updateUserInfo(req, res, next) {
   const { name, about } = req.body;
@@ -101,7 +108,7 @@ export function updateUserInfo(req, res, next) {
         { name, about },
         { new: true, runValidators: true },
       )
-        .then((updatedUser) => res.send({ data: updatedUser }));
+        .then((updatedUser) => res.send(updatedUser));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -125,7 +132,7 @@ export function updateAvatar(req, res, next) {
         { avatar },
         { new: true, runValidators: true },
       )
-        .then((updatedUser) => res.send({ data: updatedUser }))
+        .then((updatedUser) => res.send(updatedUser))
         .catch(next);
     })
     .catch((err) => {
@@ -143,7 +150,7 @@ export function getCurrentUser(req, res, next) {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {

@@ -4,11 +4,11 @@ import UnauthorizedError from '../utils/errors/unauthorized-error.js';
 import secretKey from '../utils/secretKey.js';
 
 export default function auth(req, res, next) {
-  const token = req.cookies.jwt;
-  // console.log('req cookies', req.cookies);
-  if (!token) {
+  const { authorization } = req.headers;
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new UnauthorizedError('Необходима авторизация');
   }
+  const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, secretKey);

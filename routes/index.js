@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 import express from 'express';
 import { celebrate, Joi } from 'celebrate';
-import { login, createUser, logout } from '../controllers/users.js';
+import { login, createUser } from '../controllers/users.js';
 import userRouter from './users.js';
 import cardRouter from './cards.js';
 import auth from '../middlewares/auth.js';
@@ -52,7 +52,7 @@ router.post('/signin', celebrate({
 
 router.use(auth);
 
-router.get('/signout', logout);
+// router.get('/signout', logout);
 
 router.use('/users', userRouter);
 router.use('/cards', cardRouter);
