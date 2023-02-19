@@ -1,7 +1,8 @@
 /* eslint-disable import/extensions */
 import jwt from 'jsonwebtoken';
 import UnauthorizedError from '../utils/errors/unauthorized-error.js';
-import secretKey from '../utils/secretKey.js';
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 export default function auth(req, res, next) {
   const { authorization } = req.headers;
@@ -11,7 +12,7 @@ export default function auth(req, res, next) {
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
-    payload = jwt.verify(token, secretKey);
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
     next(new UnauthorizedError('Необходима авторизация'));
     return;

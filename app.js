@@ -9,7 +9,7 @@ import centralizedErrorHandler from './middlewares/centralizedErrorHandler.js';
 import { requestLogger, errorLogger } from './middlewares/logger.js';
 import corsHandler from './middlewares/cors.js';
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 const app = express();
 
 dotenv.config();
