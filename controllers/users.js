@@ -6,7 +6,8 @@ import User from '../models/user.js';
 import BadRequestError from '../utils/errors/bad-request-error.js';
 import NotFoundError from '../utils/errors/not-found-error.js';
 import ConflictError from '../utils/errors/conflict-error.js';
-import secretKey from '../utils/secretKey.js';
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 export function getAllUsers(req, res, next) {
   User.find({})
@@ -61,7 +62,11 @@ export function login(req, res, next) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
       return res
         .send({
           _id: user._id,
@@ -72,31 +77,8 @@ export function login(req, res, next) {
           token,
         });
     })
-  // return res
-  //   .cookie('jwt', token, {
-  //     maxage: 3600000 * 24 * 7,
-  //     httpOnly: true,
-  //     sameSite: 'none',
-  //     secure: true,
-  //     domain: 'localhost',
-  //   })
-  //   .cookie('testCookie', 'Вы вошли', {
-  //     maxage: 3600000 * 24 * 7,
-  //     sameSite: 'none',
-  //     secure: true,
-  //     domain: 'localhost',
-  //   })
-  // .send({ data: user });
     .catch(next);
 }
-
-// export function logout(req, res, next) {
-//   try {
-//     res.clearCookie('jwt').send({ message: 'Вы вышли' });
-//   } catch (err) {
-//     next(err);
-//   }
-// }
 
 export function updateUserInfo(req, res, next) {
   const { name, about } = req.body;

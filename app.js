@@ -1,4 +1,5 @@
 /* eslint-disable import/extensions */
+import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
@@ -10,6 +11,8 @@ import corsHandler from './middlewares/cors.js';
 
 const { PORT = 3000 } = process.env;
 const app = express();
+
+dotenv.config();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(bodyParser.json());
