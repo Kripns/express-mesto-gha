@@ -10,6 +10,12 @@ import urlPattern from '../utils/urlPattern.js';
 
 const router = express.Router();
 
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi
@@ -51,8 +57,6 @@ router.post('/signin', celebrate({
 }), login);
 
 router.use(auth);
-
-// router.get('/signout', logout);
 
 router.use('/users', userRouter);
 router.use('/cards', cardRouter);
