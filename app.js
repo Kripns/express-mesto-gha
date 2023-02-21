@@ -9,10 +9,10 @@ import centralizedErrorHandler from './middlewares/centralizedErrorHandler.js';
 import { requestLogger, errorLogger } from './middlewares/logger.js';
 import corsHandler from './middlewares/cors.js';
 
+dotenv.config();
+
 const { PORT = 3000 } = process.env;
 const app = express();
-
-dotenv.config();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(corsHandler);
