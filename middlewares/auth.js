@@ -1,4 +1,9 @@
+/* eslint-disable import/first */
 /* eslint-disable import/extensions */
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 import jwt from 'jsonwebtoken';
 import UnauthorizedError from '../utils/errors/unauthorized-error.js';
 
