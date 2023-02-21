@@ -1,5 +1,8 @@
+/* eslint-disable import/first */
 /* eslint-disable import/extensions */
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
@@ -8,8 +11,6 @@ import routes from './routes/index.js';
 import centralizedErrorHandler from './middlewares/centralizedErrorHandler.js';
 import { requestLogger, errorLogger } from './middlewares/logger.js';
 import corsHandler from './middlewares/cors.js';
-
-dotenv.config();
 
 const { PORT = 3000 } = process.env;
 const app = express();
