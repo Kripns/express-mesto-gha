@@ -7,8 +7,6 @@ import BadRequestError from '../utils/errors/bad-request-error.js';
 import NotFoundError from '../utils/errors/not-found-error.js';
 import ConflictError from '../utils/errors/conflict-error.js';
 
-const { NODE_ENV, JWT_SECRET } = process.env;
-
 export function getAllUsers(req, res, next) {
   User.find({})
     .then((users) => res.send(users))
@@ -59,6 +57,7 @@ export function createUser(req, res, next) {
 }
 
 export function login(req, res, next) {
+  const { NODE_ENV, JWT_SECRET } = process.env;
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
